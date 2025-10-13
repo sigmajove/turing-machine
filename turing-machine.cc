@@ -418,23 +418,12 @@ void Analyzer::Restrict(const Triple& code, std::size_t card, bool success) {
 
 void Analyzer::GenerateCombinations(std::size_t start) {
   if (start >= selected_.size()) {
-    const bool trace =
-        (selected_[0] == 1 && selected_[1] == 2 && selected_[2] == 1 &&
-         (selected_[3] == 0 || selected_[3] == 2 || selected_[3] == 4) &&
-         (selected_[4] == 6 || selected_[4] == 4 || selected_[4] == 2));
-    if (trace) {
-      std::cout << "trace";
-      for (auto i : selected_) {
-        std::cout << " " << i;
-      }
-      std::cout << "\n";
-    }
     // Construct a vector of criteria
     Selected s(selected_.size());
     for (std::size_t i = 0; i < selected_.size(); ++i) {
       s[i] = (cards_[i])[selected_[i]];
     }
-    if (const auto answer = solve(s, trace)) {
+    if (const auto answer = solve(s)) {
       // See if every criterion is necessary.
       bool bad = false;
       for (std::size_t i = 0; i < s.size(); ++i) {
