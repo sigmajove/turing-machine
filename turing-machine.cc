@@ -16,8 +16,6 @@
 
 #include "verifiers.h";
 
-using Triple = std::array<int, 3>;
-
 // A puzzle where a Criterion has been selected for each Verifier;
 using Selected = std::vector<Criterion>;
 
