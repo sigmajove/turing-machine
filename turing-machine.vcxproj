@@ -126,6 +126,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="turing-machine.cc" />
+    <ClCompile Include="verifiers.cc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="verifiers.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

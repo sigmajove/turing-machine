@@ -18,5 +18,13 @@
     <ClCompile Include="turing-machine.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="verifiers.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="verifiers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
