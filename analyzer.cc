@@ -137,16 +137,27 @@ void Analyzer::GenerateCombinations(std::size_t start) {
   if (start >= selected_.size()) {
     // Construct a vector of criteria
     Selected s(selected_.size());
+    const bool trace = false;
+    if (trace) {
+    std::cout << "selected";
+    for (auto z : selected_) {
+      std::cout << " " << z;
+    }
+    std::cout << "\n"; 
+}   
     for (std::size_t i = 0; i < selected_.size(); ++i) {
       s[i] = (cards_[i])[selected_[i]];
     }
-    if (const auto answer = solve(s)) {
+    if (const auto answer = solve(s, trace)) {
       // See if every criterion is necessary.
       bool bad = false;
       for (std::size_t i = 0; i < s.size(); ++i) {
         Selected smaller = s;
         smaller.erase(smaller.begin() + i);
         if (solve(smaller)) {
+if (trace) {
+          std::cout << i << " is redundant\n";
+}
           bad = true;
           break;
         }
