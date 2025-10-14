@@ -6,6 +6,8 @@
 
 #include "../verifiers.h"
 
+// This is throwaway code to build the verifier tests.
+
 std::vector<Triple> RandTriples(std::mt19937& rand) {
   std::vector<Triple> result;
   result.reserve(125);
