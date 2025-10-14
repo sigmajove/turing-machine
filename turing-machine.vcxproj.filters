@@ -21,9 +21,15 @@
     <ClCompile Include="verifiers.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="analyzer.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="verifiers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="analyzer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

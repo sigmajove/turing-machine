@@ -1,8 +1,39 @@
 #include <cstddef>
 #include <map>
 
+#include "../analyzer.h"
 #include "../verifiers.h"
 #include "gtest/gtest.h"
+
+// Repeat the result of a game played on Board Game Arena
+void TestGame(const std::string& input, const Triple& answer) {
+  const std::vector<Triple> candidates = GetCandidates(input);
+  if (candidates.empty()) {
+    ADD_FAILURE() << "No candidates";
+  } else if (candidates.size() > 1) {
+    ADD_FAILURE() << "Too many candidates";
+  } else {
+    EXPECT_EQ(candidates.front(), answer);
+  }
+}
+
+TEST(PlayGame, game1) {
+  TestGame(R"(
+19 25 27 36 44
+111 a+ b-
+112 d- e+
+)",
+           {2, 1, 2});
+}
+
+TEST(PlayGame, game2) {
+  TestGame(R"(
+22 27 39 43 48
+113 b+ c- d+
+125 b+ c- e+
+)",
+           {2, 3, 3});
+}
 
 // These tests excercise the verifiers. It's tricky to test them, since
 // correctness means "it does what it is written on the card. One approach is

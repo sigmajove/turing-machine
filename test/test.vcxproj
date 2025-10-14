@@ -98,9 +98,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\analyzer.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\analyzer.cc" />
     <ClCompile Include="..\verifiers.cc" />
     <ClCompile Include="test.cpp" />
     <ClCompile Include="pch.cpp">
