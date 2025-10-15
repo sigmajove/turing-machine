@@ -17,19 +17,14 @@
 #include "analyzer.h"
 #include "verifiers.h";
 
-std::vector<Triple> Matching(const Verifier& v, std::size_t which) {
-  if (which >= v.size()) {
-    throw std::runtime_error(
-        std::format("which {} out of bounds {}", which, v.size()));
-  }
-  const Criterion c = v[which];
+// Returns all possible codes that will distinguish between the two criteria.
+std::vector<Triple> Probe(Criterion c1, Criterion c2) {
   std::vector<Triple> result;
   for (int i = 1; i <= 5; ++i) {
     for (int j = 1; j <= 5; ++j) {
       for (int k = 1; k <= 5; ++k) {
-        if (c(i, j, k)) {
-          const Triple t{i, j, k};
-          result.push_back(t);
+        if (c1(i, j, k) != c2(i, j, k)) {
+          result.push_back(Triple{i, j, k});
         }
       }
     }
@@ -115,24 +110,54 @@ int main(int argc, char* argv[]) {
     std::cout << "===============\n";
 #endif
 
+    // We next find the next guess to suggest to the player. We would like
+    // to get the answer in a few probes as possible. However, getting the
+    // very best answer is a hard problem that I declined to solve. Instead
+    // I use some heuristics to return a pretty good result.
+
     std::map<Triple, std::set<std::size_t>> guesses;
 
     for (std::size_t card = 0; card < analyzer.distrib_.size(); ++card) {
       const auto& m = analyzer.distrib_[card];
+      // There needs to be at least two keys to form a query that
+      // distinguishes between those two keys.
       if (m.size() <= 1) {
         continue;
       }
-#if 0
-      std::cout << "Processes distribution for card " << card << "\n";
-#endif
-      for (const auto& [which, count] : m) {
-#if 0
-        std::cout << which << " " << count << "\n";
-#endif
-        auto xxx = Matching(analyzer.get_verifier(card), which);
-        for (const Triple& t : xxx) {
-          guesses.try_emplace(t).first->second.insert(card);
+
+      // Iterate over m, finding they keys of the largest and second largest
+      // values.
+      std::size_t largest_value = 0;
+      std::size_t largest_key = 0;
+      std::size_t second_largest_value = 0;
+      std::size_t second_largest_key = 0;
+      for (auto [key, value] : m) {
+        if (value == 0) {
+          // Because we create the keys on demand when we see them,
+          // there should never be a key with a count of zero.
+          throw std::runtime_error("count should not be zero");
         }
+        // In the following tests, we use >= rather than >, so that
+        // if there are only two elements in the map, and they are equal,
+        // both will show up as largest and second_largest. We don't
+        // care about the order.
+        if (value >= largest_value) {
+          second_largest_value = largest_value;
+          second_largest_key = largest_key;
+          largest_value = value;
+          largest_key = key;
+        } else if (value >= second_largest_value) {
+          second_largest_key = key;
+          second_largest_value = value;
+        }
+      }
+      if (largest_value == 0 || second_largest_value == 0) {
+        throw std::runtime_error("values should not be zero");
+      }
+
+      const Verifier& v = analyzer.get_verifier(card);
+      for (const Triple& t : Probe(v[largest_key], v[second_largest_key])) {
+        guesses.try_emplace(t).first->second.insert(card);
       }
     }
 
