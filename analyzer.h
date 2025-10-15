@@ -21,7 +21,7 @@ class Analyzer {
 
   void GenerateCombinations(std::size_t start);
 
-  std::map<Triple, std::vector<std::set<std::size_t>>> result_;
+  std::map<Triple, std::vector<std::set<std::size_t>>> candidates;
 
   // For each card, a count of times each number shows up
   // in selection.

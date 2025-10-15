@@ -139,12 +139,12 @@ void Analyzer::GenerateCombinations(std::size_t start) {
     Selected s(selected_.size());
     const bool trace = false;
     if (trace) {
-    std::cout << "selected";
-    for (auto z : selected_) {
-      std::cout << " " << z;
+      std::cout << "selected";
+      for (auto z : selected_) {
+        std::cout << " " << z;
+      }
+      std::cout << "\n";
     }
-    std::cout << "\n"; 
-}   
     for (std::size_t i = 0; i < selected_.size(); ++i) {
       s[i] = (cards_[i])[selected_[i]];
     }
@@ -155,16 +155,16 @@ void Analyzer::GenerateCombinations(std::size_t start) {
         Selected smaller = s;
         smaller.erase(smaller.begin() + i);
         if (solve(smaller)) {
-if (trace) {
-          std::cout << i << " is redundant\n";
-}
+          if (trace) {
+            std::cout << i << " is redundant\n";
+          }
           bad = true;
           break;
         }
       }
       if (!bad) {
         std::vector<std::set<std::size_t>>& xxx =
-            result_.try_emplace(*answer, cards_.size()).first->second;
+            candidates.try_emplace(*answer, cards_.size()).first->second;
         for (std::size_t i = 0; i < xxx.size(); ++i) {
           xxx[i].insert(selected_[i]);
         }
@@ -195,8 +195,8 @@ std::vector<Triple> GetCandidates(const std::string& input) {
   analyzer.GenerateCombinations(0);
 
   std::vector<Triple> result;
-  result.reserve(analyzer.result_.size());
-  for (const auto [key, val] : analyzer.result_) {
+  result.reserve(analyzer.candidates.size());
+  for (const auto [key, val] : analyzer.candidates) {
     result.push_back(key);
   }
   return result;

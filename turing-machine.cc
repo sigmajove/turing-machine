@@ -62,13 +62,13 @@ int main(int argc, char* argv[]) {
 
     // Compute max widths
     std::vector<std::size_t> maxw(analyzer.size());
-    for (auto& [key, value] : analyzer.result_) {
+    for (auto& [key, value] : analyzer.candidates) {
       for (std::size_t i = 0; i < maxw.size(); ++i) {
         maxw[i] = std::max(maxw[i], value[i].size());
       }
     }
 
-    for (auto& [key, value] : analyzer.result_) {
+    for (auto& [key, value] : analyzer.candidates) {
       for (int i : key) {
         std::cout << i;
       }
@@ -90,7 +90,7 @@ int main(int argc, char* argv[]) {
       std::cout << "]\n";
     }
 
-    switch (analyzer.result_.size()) {
+    switch (analyzer.candidates.size()) {
       case 0:
         std::cout << "No answer!\n";
         return 0;
@@ -166,6 +166,13 @@ int main(int argc, char* argv[]) {
     for (const auto& [t, s] : guesses) {
       guess_size = std::max(guess_size, s.size());
     }
+
+    // A heuristic I think works most of the time. On the theory that each
+    // guess will eliminate a candidate, we limit the number of guesses
+    // when the list of canidates is small. A worst, this will causes us
+    // to waste guesses in a round.
+    guess_size = std::min(guess_size, analyzer.candidates.size() - 1);
+
     // At most three guesses.
     guess_size = std::min(guess_size, static_cast<std::size_t>(3));
 
