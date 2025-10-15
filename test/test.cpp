@@ -55,6 +55,24 @@ TEST(PlayGame, game4) {
            {5, 3, 4});
 }
 
+TEST(PlayGame, game5) {
+  TestGame(R"(
+15 22 23 26 33 47
+422 a+ d+ f+
+)",
+           {4, 1, 2});
+}
+
+TEST(PlayGame, game6) {
+  TestGame(R"(
+25 31 33 40 44 46
+311 a- b+ d-
+241 c+ d+ e-
+111 f-
+)",
+           {2, 4, 5});
+}
+
 // These tests exercise the verifiers. It's tricky to test them, since
 // correctness means "it does what it is written on the card. One approach is
 // to stare at the code and stare at the card and convince oneself they are
