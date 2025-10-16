@@ -51,6 +51,23 @@ int main(int argc, char* argv[]) {
 
     const ParseResult input = Parse(file_contents);
 
+    std::cout << "Cards:";
+    for (std::size_t c : input.cards) {
+      std::cout << " " << c;
+    }
+    std::cout << "\n";
+
+    // Echo back the input.
+    for (auto& [query, result] : input.lines) {
+      std::cout << std::format("Code {}{}{}:", query[0], query[1], query[2]);
+
+      for (auto& [card, answer] : result) {
+        std::cout << " " << static_cast<char>('a' + card)
+                  << (answer ? '+' : '-');
+      }
+      std::cout << "\n";
+    }
+
     // The numbers of the cards in the input.
     Analyzer analyzer(input.cards);
 
@@ -61,6 +78,19 @@ int main(int argc, char* argv[]) {
     }
     analyzer.GenerateCombinations(0);
 
+    switch (analyzer.candidates.size()) {
+      case 0:
+        std::cout << "No answer meets all the constraints.\n";
+        return 0;
+      case 1: {
+        const Triple answer = analyzer.candidates.begin()->first;
+        std::cout << std::format("The answer is {}{}{}\n", answer[0], answer[1],
+                                 answer[2]);
+        return 0;
+      }
+    }
+
+#if 0
     // Compute max widths
     std::vector<std::size_t> maxw(analyzer.size());
     for (auto& [key, value] : analyzer.candidates) {
@@ -90,15 +120,7 @@ int main(int argc, char* argv[]) {
       }
       std::cout << "]\n";
     }
-
-    switch (analyzer.candidates.size()) {
-      case 0:
-        std::cout << "No answer!\n";
-        return 0;
-      case 1:
-        std::cout << "Time to guess\n";
-        return 0;
-    }
+#endif
 
 #if 0
     std::cout << "\nDistribution\n";
@@ -170,6 +192,7 @@ int main(int argc, char* argv[]) {
     // At most three guesses.
     guess_size = std::min(guess_size, static_cast<std::size_t>(3));
 
+#if 0
     // Find a guess at that big.
     std::cout << "\nCandidate guesses\n";
     for (const auto& [t, s] : guesses) {
@@ -182,6 +205,7 @@ int main(int argc, char* argv[]) {
         std::cout << "\n";
       }
     }
+#endif
 
     // We take as many guesses as we can per round. Very occasionally,
     // this policy will cause us to take a guess that does not add any
@@ -217,7 +241,7 @@ int main(int argc, char* argv[]) {
       }
     }
 
-    std::cout << std::format("\nGuess {}{}{}: ", (*pick_t)[0], (*pick_t)[1],
+    std::cout << std::format("Guess {}{}{}: ", (*pick_t)[0], (*pick_t)[1],
                              (*pick_t)[2]);
 
     // Select guess_size values from *pick_s at random such that
@@ -235,11 +259,11 @@ int main(int argc, char* argv[]) {
         // Replace one of the picked value with probability
         // num_guesses / k. This ensures that each member of (*picked_s)
         // has a probability of guess_size / picked_s->size() of being
-        // chosen. 
+        // chosen.
         std::uniform_int_distribution<> dist(1, k);
         if (dist(gen) <= guess_size) {
-          std::uniform_int_distribution<> dist2(1,
-                                               static_cast<int>(picked.size()));
+          std::uniform_int_distribution<> dist2(
+              1, static_cast<int>(picked.size()));
           picked[dist2(gen) - 1] = q;
         }
       }
