@@ -167,13 +167,6 @@ int main(int argc, char* argv[]) {
     for (const auto& [t, s] : guesses) {
       guess_size = std::max(guess_size, s.size());
     }
-
-    // A heuristic I think works most of the time. On the theory that each
-    // guess will eliminate a candidate, we limit the number of guesses
-    // when the list of canidates is small. A worst, this will causes us
-    // to waste guesses in a round.
-    guess_size = std::min(guess_size, analyzer.candidates.size() - 1);
-
     // At most three guesses.
     guess_size = std::min(guess_size, static_cast<std::size_t>(3));
 
@@ -189,6 +182,11 @@ int main(int argc, char* argv[]) {
         std::cout << "\n";
       }
     }
+
+    // We take as many guesses as we can per round. Very occasionally,
+    // this policy will cause us to take a guess that does not add any
+    // information. I suppose we could rerun the analysis after each guess
+    // to determine whether the subsequent guesses are adding information.
 
     // Random number boilerplate
     std::random_device rd;
