@@ -7,6 +7,7 @@
 #include <iostream>
 #include <map>
 #include <optional>
+#include <random>
 #include <regex>
 #include <set>
 #include <sstream>
@@ -15,7 +16,7 @@
 #include <vector>
 
 #include "analyzer.h"
-#include "verifiers.h";
+#include "verifiers.h"
 
 // Returns all possible codes that will distinguish between the two criteria.
 std::vector<Triple> Probe(Criterion c1, Criterion c2) {
@@ -177,33 +178,79 @@ int main(int argc, char* argv[]) {
     guess_size = std::min(guess_size, static_cast<std::size_t>(3));
 
     // Find a guess at that big.
-    std::cout << "\nSuggested guesses\n";
+    std::cout << "\nCandidate guesses\n";
     for (const auto& [t, s] : guesses) {
       if (s.size() >= guess_size) {
         std::cout << std::format("{}{}{}: ", t[0], t[1], t[2]);
 
-        std::size_t used = 0;
         for (auto q : s) {
           std::cout << static_cast<char>('a' + q);
-          if (++used >= guess_size) {
-            break;
-          }
         }
-        std::cout << std::format(" (size: {})", s.size());
         std::cout << "\n";
       }
     }
 
-#if 0
-    std::cout << "\nAll of them\n";
+    // Random number boilerplate
+    std::random_device rd;
+    std::mt19937 gen(rd());
+
+    const Triple* pick_t = nullptr;
+    const std::set<std::size_t>* pick_s = 0;
+
+    // num_seem is the number of candidates we have looked at
+    // where s.size() >= guess_size.
+    int num_seen = 0;
+
     for (const auto& [t, s] : guesses) {
-      std::cout << std::format("{}{}{}: ", t[0], t[1], t[2]);
-      for (auto i : s) {
-        std::cout << i;
+      if (num_seen == 0) {
+        pick_t = &t;
+        pick_s = &s;
+        if (s.size() >= guess_size) {
+          num_seen = 1;
+        }
+      } else if ((s.size() >= guess_size)) {
+        ++num_seen;
+        std::uniform_int_distribution<> dist(1, num_seen);
+        if (dist(gen) == 1) {
+          // Execute the code with probability 1 in num_seen+1
+          pick_t = &t;
+          pick_s = &s;
+        }
       }
-      std::cout << "\n";
     }
-#endif
+
+    std::cout << std::format("\nGuess {}{}{}: ", (*pick_t)[0], (*pick_t)[1],
+                             (*pick_t)[2]);
+
+    // Select guess_size values from *pick_s at random such that
+    // each member of *pick_s has an equal chance of being selected.
+    // Fun fact:  This was one of my interview question for Google.
+    std::vector<std::size_t> picked;
+    int k = 0;
+    for (auto q : *pick_s) {
+      // k is the number of values we have looked at.
+      ++k;
+      // Unconditionally keep values until we have guess_size.
+      if (picked.size() < guess_size) {
+        picked.push_back(q);
+      } else {
+        // Replace one of the picked value with probability
+        // num_guesses / k. This ensures that each member of (*picked_s)
+        // has a probability of guess_size / picked_s->size() of being
+        // chosen. 
+        std::uniform_int_distribution<> dist(1, k);
+        if (dist(gen) <= guess_size) {
+          std::uniform_int_distribution<> dist2(1,
+                                               static_cast<int>(picked.size()));
+          picked[dist2(gen) - 1] = q;
+        }
+      }
+    }
+    std::sort(picked.begin(), picked.end());
+    for (std::size_t p : picked) {
+      std::cout << static_cast<char>('a' + p);
+    }
+    std::cout << "\n";
 
   } catch (const std::runtime_error& e) {
     std::cerr << e.what() << "\n";
