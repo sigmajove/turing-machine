@@ -73,6 +73,13 @@ TEST(PlayGame, game6) {
            {2, 4, 5});
 }
 
+TEST(PlayGame, game7) {
+  TestGame(R"(
+2 19 23 24 33 35
+)",
+           {3, 1, 3});
+}
+
 // These tests exercise the verifiers. It's tricky to test them, since
 // correctness means "it does what it is written on the card. One approach is
 // to stare at the code and stare at the card and convince oneself they are
