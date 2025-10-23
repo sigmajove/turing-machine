@@ -99,12 +99,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\analyzer.h" />
+    <ClInclude Include="control_cards.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="test_games.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\analyzer.cc" />
     <ClCompile Include="..\verifiers.cc" />
+    <ClCompile Include="control_cards.cc" />
     <ClCompile Include="test.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
