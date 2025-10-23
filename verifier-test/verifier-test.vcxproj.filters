@@ -21,5 +21,16 @@
     <ClCompile Include="..\verifiers.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\test\control_cards.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\evaluator.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\test\evaluator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
