@@ -4,7 +4,7 @@
 
 constexpr bool T = true;
 constexpr bool F = true;
-std::array<std::array<bool, 131>, 95> control_cards = {
+std::array<std::array<bool, 131>, 95> control_cards{
     {{T, F, F, F, T, F, F, F, F, F, F, F, T, F, T, F, F, F, F, F, F, T,
       F, F, F, F, F, F, T, F, F, F, F, F, F, F, F, F, F, F, F, F, T, T,
       F, F, F, F, T, T, F, T, T, F, F, F, F, T, F, F, F, F, F, F, F, F,
