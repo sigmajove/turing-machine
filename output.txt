@@ -1,0 +1,28 @@
+Running main() from D:\a\_work\1\s\googletest\googletest\src\gtest_main.cc
+Note: Google Test filter = SomeName.one_games
+[==========] Running 1 test from 1 test case.
+[----------] Global test environment set-up.
+[----------] 1 test from SomeName
+[ RUN      ] SomeName.one_games
+card id 36 (585)
+card id 58 (441)
+card id 23 (651)
+card id 7 (754)
+Criteria cards: 2 5 8 12
+Looking for answer 515
+Candidates
+414
+515
+Card 0 has size 1 
+Card 1 has size 2 
+For card 1 diff 1 and 0
+Card 2 has size 1 
+Card 3 has size 1 
+Guess 531 1
+ 1
+[       OK ] SomeName.one_games (2 ms)
+[----------] 1 test from SomeName (2 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test case ran. (2 ms total)
+[  PASSED  ] 1 test.

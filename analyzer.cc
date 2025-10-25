@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <format>
 #include <iostream>
+#include <iterator>
 #include <map>
 #include <optional>
 #include <regex>
@@ -110,18 +111,6 @@ std::optional<Triple> solve(const Selected& selected, bool trace = false) {
   return result;
 }
 
-Analyzer::Analyzer(const std::vector<std::size_t>& cards)
-    : selected_(cards.size()), distrib_(cards.size()) {
-  for (std::size_t i : cards) {
-    // Convert 1-based card numbers to 0-based subscripts.
-    const Verifier v = verifiers[i - 1];
-    if (v.empty()) {
-      throw std::runtime_error(std::format("Card {} is not implemented", i));
-    }
-    cards_.push_back(v);
-  }
-}
-
 // Record the output of a query for a particular card.
 void Analyzer::Restrict(const Triple& code, std::size_t card, bool success) {
   // Delete from the card every verifier whose output does not
@@ -129,11 +118,11 @@ void Analyzer::Restrict(const Triple& code, std::size_t card, bool success) {
   auto test = [&code, success](Criterion c) {
     return c(code[0], code[1], code[2]) != success;
   };
-  auto& vec = cards_[card];
+  std::vector<Criterion>& vec = verifiers_[card];
   vec.erase(std::remove_if(vec.begin(), vec.end(), test), vec.end());
 }
 
-void Analyzer::GenerateCombinations(std::size_t start) {
+void Analyzer::GenerateCombinations(std::size_t start, Output& output) {
   if (start >= selected_.size()) {
     // Construct a vector of criteria
     Selected s(selected_.size());
@@ -146,7 +135,7 @@ void Analyzer::GenerateCombinations(std::size_t start) {
       std::cout << "\n";
     }
     for (std::size_t i = 0; i < selected_.size(); ++i) {
-      s[i] = (cards_[i])[selected_[i]];
+      s[i] = (verifiers_[i])[selected_[i]];
     }
     if (const auto answer = solve(s, trace)) {
       // See if every criterion is necessary.
@@ -163,40 +152,51 @@ void Analyzer::GenerateCombinations(std::size_t start) {
         }
       }
       if (!bad) {
+        // Add *answer, i as a candidate.
         std::vector<std::set<std::size_t>>& xxx =
-            candidates.try_emplace(*answer, cards_.size()).first->second;
+            output.candidates.try_emplace(*answer, verifiers_.size())
+                .first->second;
         for (std::size_t i = 0; i < xxx.size(); ++i) {
           xxx[i].insert(selected_[i]);
         }
 
         for (std::size_t card = 0; card < selected_.size(); ++card) {
-          ++(distrib_[card].try_emplace(selected_[card], 0).first->second);
+          ++(output.distribution[card]
+                 .try_emplace(selected_[card], 0)
+                 .first->second);
         }
       }
     }
   } else {
-    for (std::size_t i = 0; i < cards_[start].size(); ++i) {
+    for (std::size_t i = 0; i < verifiers_[start].size(); ++i) {
       selected_[start] = i;
-      GenerateCombinations(start + 1);
+      GenerateCombinations(start + 1, output);
     }
   }
 }
 
 std::vector<Triple> GetCandidates(const std::string& input) {
   const ParseResult parsed = Parse(input);
-  // The numbers of the cards in the input.
-  Analyzer analyzer(parsed.cards);
+
+  // Translate a vector of cards numbers to a vector of Verifiers.
+  std::vector<Verifier> verifiers;
+  verifiers.reserve(parsed.cards.size());
+  std::transform(parsed.cards.begin(), parsed.cards.end(),
+                 std::back_inserter(verifiers),
+                 [](std::size_t card_num) { return GetVerifier(card_num); });
+
+  Analyzer analyzer(verifiers);
 
   for (auto& [query, query_result] : parsed.lines) {
     for (auto& [card, answer] : query_result) {
       analyzer.Restrict(query, card, answer);
     }
   }
-  analyzer.GenerateCombinations(0);
+  const auto output = analyzer.Run();
 
   std::vector<Triple> result;
-  result.reserve(analyzer.candidates.size());
-  for (const auto [key, val] : analyzer.candidates) {
+  result.reserve(output.candidates.size());
+  for (const auto [key, val] : output.candidates) {
     result.push_back(key);
   }
   return result;

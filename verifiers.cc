@@ -1,5 +1,25 @@
 #include "verifiers.h"
 
+#include <array>
+#include <cstddef>
+#include <format>
+#include <stdexcept>
+
+Verifier GetVerifier(std::size_t v) {
+  if (v < 1 || v > verifiers.size()) {
+    throw std::runtime_error(
+        std::format("{} is not a valid verifier number", v));
+  }
+  // Convert 1-based card numbers to 0-based subscripts.
+  const Verifier result = verifiers[v - 1];
+
+  if (result.empty()) {
+    throw std::runtime_error(std::format("Card {} is not implemented", v));
+  }
+
+  return result;
+}
+
 int HowMany(int i, int j, int k, int x) {
   int count = 0;
   if (i == x) {

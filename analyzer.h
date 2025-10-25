@@ -11,24 +11,45 @@
 
 class Analyzer {
  public:
-  explicit Analyzer(const std::vector<std::size_t>& cards);
+  using GuessCandidates = std::map<Triple, std::vector<std::set<std::size_t>>>;
+
+  // The output of the analyzer.
+  struct Output {
+    // All useful codes, and for each code all the useful
+    // criterion cards.
+    GuessCandidates candidates;
+
+    // For each criteron card, a count of the number of times each test
+    // on the card shows up.
+    std::vector<std::map<std::size_t, std::size_t>> distribution;
+
+    explicit Output(std::size_t s) : distribution(s) {}
+
+    // Confirm this type has a default move constructor;
+    Output(Output&&) = default;
+  };
+
+  explicit Analyzer(const std::vector<Verifier>& verifiers)
+      : verifiers_(verifiers), selected_(verifiers.size()) {}
+
   std::size_t size() const { return selected_.size(); }
+
   const Verifier& get_verifier(std::size_t which) const {
-    return cards_[which];
+    return verifiers_[which];
+  }
+
+  Output Run() {
+    Output result(verifiers_.size());
+    GenerateCombinations(0, result);
+    return result;
   }
 
   void Restrict(const Triple& code, std::size_t card, bool success);
 
-  void GenerateCombinations(std::size_t start);
-
-  std::map<Triple, std::vector<std::set<std::size_t>>> candidates;
-
-  // For each card, a count of times each number shows up
-  // in selection.
-  std::vector<std::map<std::size_t, std::size_t>> distrib_;
-
  private:
-  std::vector<Verifier> cards_;
+  void GenerateCombinations(std::size_t start, Output& output);
+
+  std::vector<Verifier> verifiers_;
   std::vector<std::size_t> selected_;
 };
 

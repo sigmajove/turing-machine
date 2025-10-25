@@ -4,6 +4,10 @@
 #include "../analyzer.h"
 #include "../verifiers.h"
 #include "gtest/gtest.h"
+#include "run_game.h"
+#include "test_games.h"
+
+TEST(SomeName, one_games) { EXPECT_TRUE(RunGame(test_games[0])); }
 
 // Repeat the result of a game played on Board Game Arena
 void TestGame(const std::string& input, const Triple& answer) {

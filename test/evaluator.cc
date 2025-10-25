@@ -53,7 +53,7 @@ Evaluator::Evaluator(const std::vector<int>& cards) {
       throw std::runtime_error(std::format("Unknown control card {}", c));
     }
     std::cout << std::format("card id {} ({})\n", iter->second, c);
-#if 1
+#if 0
     grid(iter->second);
 #endif
     cards_.push_back(&control_cards[iter->second]);
