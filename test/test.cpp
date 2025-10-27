@@ -1,4 +1,5 @@
 #include <cstddef>
+#include <format>
 #include <map>
 
 #include "../analyzer.h"
@@ -7,7 +8,11 @@
 #include "run_game.h"
 #include "test_games.h"
 
-TEST(SomeName, one_games) { EXPECT_TRUE(RunGame(test_games[0])); }
+TEST(SomeName, one_games) {
+  for (std::size_t i = 0; i < test_games.size(); ++i) {
+    EXPECT_TRUE(RunGame(test_games[i])) << std::format("Test {} failed\n", i);
+  }
+}
 
 // Repeat the result of a game played on Board Game Arena
 void TestGame(const std::string& input, const Triple& answer) {
@@ -91,12 +96,25 @@ TEST(PlayGame, game8) {
            {2, 5, 1});
 }
 
+// Verifier cards are 780 686 580 453 648 634
+TEST(PlayGame, game9) {
+  RunGame({{
+               {2, 780},
+               {23, 686},
+               {33, 580},
+               {41, 453},
+               {48, 634},
+           },
+           {1, 4, 2}});
+  // 2 23 33 41 45 48
+}
+
 // These tests exercise the verifiers. It's tricky to test them, since
 // correctness means "it does what it is written on the card. One approach is
 // to stare at the code and stare at the card and convince oneself they are
 // equivalent. But that's tedious and probably error prone.
 
-// So I created a bunch of tabled with inputs and expected outputs.
+// So I created a bunch of tables with inputs and expected outputs.
 // That was tedious as well. I think the main benefit is that expressing the
 // rules twice and debugging them helps illuminate errors.
 

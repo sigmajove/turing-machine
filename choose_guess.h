@@ -12,3 +12,6 @@
 // Returns a triple and the indicies of the verifiers to query.
 std::pair<Triple, std::vector<std::size_t>> ChooseGuess(
     const Analyzer::Output& output, Analyzer& analyzer, std::mt19937& gen);
+
+// Returns all possible codes that will distinguish between the two criteria.
+std::vector<Triple> Probe(Criterion c1, Criterion c2);

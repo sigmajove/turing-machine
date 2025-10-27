@@ -111,6 +111,15 @@ std::optional<Triple> solve(const Selected& selected, bool trace = false) {
   return result;
 }
 
+Analyzer::Analyzer(const std::vector<std::size_t>& criteria_cards)
+    : selected_(criteria_cards.size()) {
+  verifiers_.reserve(criteria_cards.size());
+  // Convert a vector of card numbers to the implementation of those cards.
+  std::transform(criteria_cards.begin(), criteria_cards.end(),
+                 std::back_inserter(verifiers_),
+                 [](std::size_t card) { return GetVerifier(card); });
+}
+
 // Record the output of a query for a particular card.
 void Analyzer::Restrict(const Triple& code, std::size_t card, bool success) {
   // Delete from the card every verifier whose output does not
@@ -177,15 +186,7 @@ void Analyzer::GenerateCombinations(std::size_t start, Output& output) {
 
 std::vector<Triple> GetCandidates(const std::string& input) {
   const ParseResult parsed = Parse(input);
-
-  // Translate a vector of cards numbers to a vector of Verifiers.
-  std::vector<Verifier> verifiers;
-  verifiers.reserve(parsed.cards.size());
-  std::transform(parsed.cards.begin(), parsed.cards.end(),
-                 std::back_inserter(verifiers),
-                 [](std::size_t card_num) { return GetVerifier(card_num); });
-
-  Analyzer analyzer(verifiers);
+  Analyzer analyzer(parsed.cards);
 
   for (auto& [query, query_result] : parsed.lines) {
     for (auto& [card, answer] : query_result) {

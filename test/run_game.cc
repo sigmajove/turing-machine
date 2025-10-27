@@ -22,18 +22,21 @@ bool RunGame(const TestGame& test) {
                  [](const auto& p) { return p.second; });
   Evaluator evaluator(criteria);
 
-  std::vector<Verifier> verifiers;
-  verifiers.reserve(test.cards.size());
-  std::transform(test.cards.begin(), test.cards.end(),
-                 std::back_inserter(verifiers),
-                 [](const auto& p) { return GetVerifier(p.first); });
   std::cout << "Criteria cards:";
   for (auto c : test.cards) {
     std::cout << " " << c.first;
   }
   std::cout << "\n";
 
-  Analyzer analyzer(verifiers);
+  std::vector<std::size_t> criteria_cards;
+  criteria_cards.reserve(test.cards.size());
+  std::transform(test.cards.begin(), test.cards.end(),
+                 std::back_inserter(criteria_cards),
+                 [](const std::pair<int, int>& p) {
+                   return static_cast<std::size_t>(p.first);
+                 });
+
+  Analyzer analyzer(criteria_cards);
 
   // A deterministic random number generator for testing.
   std::mt19937 gen(12345);

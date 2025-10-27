@@ -29,8 +29,7 @@ class Analyzer {
     Output(Output&&) = default;
   };
 
-  explicit Analyzer(const std::vector<Verifier>& verifiers)
-      : verifiers_(verifiers), selected_(verifiers.size()) {}
+  explicit Analyzer(const std::vector<std::size_t>& criteria_cards);
 
   std::size_t size() const { return selected_.size(); }
 

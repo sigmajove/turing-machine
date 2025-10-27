@@ -16,22 +16,8 @@
 #include <vector>
 
 #include "analyzer.h"
+#include "choose_guess.h"
 #include "verifiers.h"
-
-// Returns all possible codes that will distinguish between the two criteria.
-std::vector<Triple> Probe(Criterion c1, Criterion c2) {
-  std::vector<Triple> result;
-  for (int i = 1; i <= 5; ++i) {
-    for (int j = 1; j <= 5; ++j) {
-      for (int k = 1; k <= 5; ++k) {
-        if (c1(i, j, k) != c2(i, j, k)) {
-          result.push_back(Triple{i, j, k});
-        }
-      }
-    }
-  }
-  return result;
-}
 
 int main(int argc, char* argv[]) {
   try {
@@ -76,14 +62,15 @@ int main(int argc, char* argv[]) {
         analyzer.Restrict(query, card, answer);
       }
     }
-    analyzer.GenerateCombinations(0);
 
-    switch (analyzer.candidates.size()) {
+    const auto output = analyzer.Run();
+
+    switch (output.candidates.size()) {
       case 0:
         std::cout << "No answer meets all the constraints.\n";
         return 0;
       case 1: {
-        const Triple answer = analyzer.candidates.begin()->first;
+        const Triple answer = output.candidates.begin()->first;
         std::cout << std::format("The answer is {}{}{}\n", answer[0], answer[1],
                                  answer[2]);
         return 0;
@@ -124,7 +111,7 @@ int main(int argc, char* argv[]) {
 
 #if 0
     std::cout << "\nDistribution\n";
-    for (const auto& m : analyzer.distrib_) {
+    for (const auto& m : output.distribution) {
       std::cout << "===============\n";
       for (auto [k, v] : m) {
         std::cout << k << " -> " << v << "\n";
@@ -140,8 +127,8 @@ int main(int argc, char* argv[]) {
 
     std::map<Triple, std::set<std::size_t>> guesses;
 
-    for (std::size_t card = 0; card < analyzer.distrib_.size(); ++card) {
-      const auto& m = analyzer.distrib_[card];
+    for (std::size_t card = 0; card < output.distribution.size(); ++card) {
+      const auto& m = output.distribution[card];
       // There needs to be at least two keys to form a query that
       // distinguishes between those two keys.
       if (m.size() <= 1) {
