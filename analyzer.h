@@ -47,6 +47,7 @@ class Analyzer {
 
  private:
   void GenerateCombinations(std::size_t start, Output& output);
+  void Dump(const GuessCandidates &c);
 
   std::vector<Verifier> verifiers_;
   std::vector<std::size_t> selected_;

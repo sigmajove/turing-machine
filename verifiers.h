@@ -13,3 +13,5 @@ const extern std::array<Verifier, 48> verifiers;
 
 // Maps the (one-based) verifier card number to the implementation of that card.
 Verifier GetVerifier(std::size_t v);
+
+void SetTrace(bool v);

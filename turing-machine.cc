@@ -65,6 +65,12 @@ int main(int argc, char* argv[]) {
 
     const auto output = analyzer.Run();
 
+    // Use a truly random number.
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    const auto [code, cards] = ChooseGuess(output, analyzer, gen);
+#if 0
+
     switch (output.candidates.size()) {
       case 0:
         std::cout << "No answer meets all the constraints.\n";
@@ -76,49 +82,6 @@ int main(int argc, char* argv[]) {
         return 0;
       }
     }
-
-#if 0
-    // Compute max widths
-    std::vector<std::size_t> maxw(analyzer.size());
-    for (auto& [key, value] : analyzer.candidates) {
-      for (std::size_t i = 0; i < maxw.size(); ++i) {
-        maxw[i] = std::max(maxw[i], value[i].size());
-      }
-    }
-
-    for (auto& [key, value] : analyzer.candidates) {
-      for (int i : key) {
-        std::cout << i;
-      }
-      std::cout << " [";
-      bool needs_space = false;
-      std::size_t index = 0;
-      for (const std::set<std::size_t>& xxx : value) {
-        if (needs_space) {
-          std::cout << " ";
-        } else {
-          needs_space = true;
-        }
-        std::cout << std::string(maxw[index] - xxx.size(), ' ');
-        for (std::size_t el : xxx) {
-          std::cout << el;
-        }
-        ++index;
-      }
-      std::cout << "]\n";
-    }
-#endif
-
-#if 0
-    std::cout << "\nDistribution\n";
-    for (const auto& m : output.distribution) {
-      std::cout << "===============\n";
-      for (auto [k, v] : m) {
-        std::cout << k << " -> " << v << "\n";
-      }
-    }
-    std::cout << "===============\n";
-#endif
 
     // We next find the next guess to suggest to the player. We would like
     // to get the answer in a few probes as possible. However, getting the
@@ -178,21 +141,6 @@ int main(int argc, char* argv[]) {
     }
     // At most three guesses.
     guess_size = std::min(guess_size, static_cast<std::size_t>(3));
-
-#if 0
-    // Find a guess at that big.
-    std::cout << "\nCandidate guesses\n";
-    for (const auto& [t, s] : guesses) {
-      if (s.size() >= guess_size) {
-        std::cout << std::format("{}{}{}: ", t[0], t[1], t[2]);
-
-        for (auto q : s) {
-          std::cout << static_cast<char>('a' + q);
-        }
-        std::cout << "\n";
-      }
-    }
-#endif
 
     // We take as many guesses as we can per round. Very occasionally,
     // this policy will cause us to take a guess that does not add any
@@ -256,7 +204,9 @@ int main(int argc, char* argv[]) {
       }
     }
     std::sort(picked.begin(), picked.end());
-    for (std::size_t p : picked) {
+#endif
+    std::cout << std::format("{}{}{} ", code[0], code[1], code[2]);
+    for (std::size_t p : cards) {
       std::cout << static_cast<char>('a' + p);
     }
     std::cout << "\n";

@@ -52,7 +52,6 @@ Evaluator::Evaluator(const std::vector<int>& cards) {
     if (iter == card_labels.end()) {
       throw std::runtime_error(std::format("Unknown control card {}", c));
     }
-    std::cout << std::format("card id {} ({})\n", iter->second, c);
 #if 0
     grid(iter->second);
 #endif

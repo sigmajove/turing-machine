@@ -81,13 +81,16 @@ ParseResult Parse(const std::string& input) {
 using Selected = std::vector<Criterion>;
 
 // Test if a selection of criteria have a solution.
-std::optional<Triple> solve(const Selected& selected, bool trace = false) {
+std::optional<Triple> solve(const Selected& selected, bool trace,
+                            std::vector<std::size_t>& temp) {
   std::optional<Triple> result = std::nullopt;
+  std::optional<Triple> other = std::nullopt;
   std::size_t hits = 0;
   for (int i = 1; i <= 5; ++i) {
     for (int j = 1; j <= 5; ++j) {
       for (int k = 1; k <= 5; ++k) {
         bool missed = false;
+        const bool ttt = (trace && i == 1 && j == 4 && k == 2);
         for (Criterion c : selected) {
           if (!c(i, j, k)) {
             missed = true;
@@ -95,14 +98,22 @@ std::optional<Triple> solve(const Selected& selected, bool trace = false) {
           }
         }
         if (!missed) {
-          if (trace) {
-            std::cout << std::format(" hit {}{}{}\n", i, j, k);
-          }
           // i, j, k accepted by every criterion
           ++hits;
+          if (!(i == 1 && j == 4 && k == 2)) {
+            other = {i, j, k};
+          }
           result = {i, j, k};
         }
       }
+    }
+  }
+  bool missed = false;
+  for (Criterion c : selected) {
+    const bool b = c(1, 4, 2);
+    if (!b) {
+      missed = true;
+      break;
     }
   }
   if (hits != 1) {
@@ -135,27 +146,16 @@ void Analyzer::GenerateCombinations(std::size_t start, Output& output) {
   if (start >= selected_.size()) {
     // Construct a vector of criteria
     Selected s(selected_.size());
-    const bool trace = false;
-    if (trace) {
-      std::cout << "selected";
-      for (auto z : selected_) {
-        std::cout << " " << z;
-      }
-      std::cout << "\n";
-    }
     for (std::size_t i = 0; i < selected_.size(); ++i) {
       s[i] = (verifiers_[i])[selected_[i]];
     }
-    if (const auto answer = solve(s, trace)) {
+    if (const auto answer = solve(s, true, selected_)) {
       // See if every criterion is necessary.
       bool bad = false;
       for (std::size_t i = 0; i < s.size(); ++i) {
         Selected smaller = s;
         smaller.erase(smaller.begin() + i);
-        if (solve(smaller)) {
-          if (trace) {
-            std::cout << i << " is redundant\n";
-          }
+        if (solve(smaller, false, selected_)) {
           bad = true;
           break;
         }
@@ -201,4 +201,19 @@ std::vector<Triple> GetCandidates(const std::string& input) {
     result.push_back(key);
   }
   return result;
+}
+
+void Analyzer::Dump(const GuessCandidates& c) {
+  std::cout << "Candidates\n";
+  for (const auto& [t, v] : c) {
+    std::cout << std::format("{}{}{}", t[0], t[1], t[2]);
+    for (const std::set<std::size_t> s : v) {
+      std::cout << std::format(" [");
+      for (std::size_t d : s) {
+        std::cout << d;
+      }
+      std::cout << "]";
+    }
+    std::cout << "\n";
+  }
 }

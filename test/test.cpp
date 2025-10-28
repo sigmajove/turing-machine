@@ -8,7 +8,7 @@
 #include "run_game.h"
 #include "test_games.h"
 
-TEST(SomeName, one_games) {
+TEST(ScrapedGames, run_all) {
   for (std::size_t i = 0; i < test_games.size(); ++i) {
     EXPECT_TRUE(RunGame(test_games[i])) << std::format("Test {} failed\n", i);
   }
@@ -96,17 +96,36 @@ TEST(PlayGame, game8) {
            {2, 5, 1});
 }
 
-// Verifier cards are 780 686 580 453 648 634
 TEST(PlayGame, game9) {
-  RunGame({{
-               {2, 780},
-               {23, 686},
-               {33, 580},
-               {41, 453},
-               {48, 634},
-           },
-           {1, 4, 2}});
-  // 2 23 33 41 45 48
+  EXPECT_TRUE(RunGame({{
+                           {2, 599},
+                           {23, 332},
+                           {33, 355},
+                           {41, 338},
+                           {48, 319},
+                       },
+                       {3, 3, 1}}));
+}
+
+TEST(PlayGame, game10) {
+  EXPECT_TRUE(RunGame({{
+                           {2, 224},
+                           {23, 715},
+                           {33, 445},
+                           {41, 213},
+                           {48, 205},
+                       },
+                       {1, 2, 3}}));
+}
+
+TEST(PlayGame, game11) {
+  EXPECT_TRUE(RunGame({{
+                           {23, 302},
+                           {33, 481},
+                           {41, 670},
+                           {48, 566},
+                       },
+                       {1, 2, 3}}));
 }
 
 // These tests exercise the verifiers. It's tricky to test them, since

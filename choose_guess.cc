@@ -38,7 +38,6 @@ std::pair<Triple, std::vector<std::size_t>> ChooseGuess(
     const auto& m = output.distribution[card];
     // There needs to be at least two keys to form a query that
     // distinguishes between those two keys.
-    std::cout << std::format("Card {} has size {} \n", card, m.size());
     if (m.size() <= 1) {
       continue;
     }
@@ -74,8 +73,6 @@ std::pair<Triple, std::vector<std::size_t>> ChooseGuess(
     }
 
     const Verifier& v = analyzer.get_verifier(card);
-    std::cout << std::format("For card {} diff {} and {}\n", card, largest_key,
-                             second_largest_key);
     for (const Triple& t : Probe(v[largest_key], v[second_largest_key])) {
       guesses.try_emplace(t).first->second.insert(card);
     }
